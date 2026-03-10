@@ -14,6 +14,7 @@ Use this checklist when validating changes in this repository.
 - `GET /health` returns success for the web flow.
 - `GET /api/overview` returns the expected web payload keys.
 - `GET /api/search?q=<term>` returns entries from active and archived logs when applicable.
+- `POST /api/prompt` supports at least `log`, `remind`, `search`, `today`, and `context` prompt patterns.
 
 ## Input Compatibility
 - Existing inputs remain compatible.
@@ -31,6 +32,7 @@ Use this checklist when validating changes in this repository.
 - Types of persisted data remain consistent.
 - `talk` creates both the conversation file and the summary file with the documented layout.
 - The web dashboard remains usable on mobile-width screens.
+- The web dashboard remains usable with a single-prompt interaction model (no action buttons required).
 - Read-only flows (`search`, `today`, `context`, `GET /api/context`, `GET /api/overview`) should not trigger unintended rewrites in persisted files.
 
 ## Documentation Consistency

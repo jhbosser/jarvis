@@ -17,6 +17,7 @@ This document defines the first web milestone for Jarvis without replacing the c
   - `reminders.json`
   - `WORKING_CONTEXT.md`
 - Supported browser flows:
+  - execute all core actions from one prompt input
   - create log entry
   - create reminder
   - mark reminder as completed

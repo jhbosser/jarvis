@@ -4,139 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jarvis Web</title>
-    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="page-shell">
-      <header class="hero">
+    <main class="single-prompt-page">
+      <header class="single-prompt-hero">
         <p class="eyebrow">Jarvis Web</p>
-        <h1>Memoria operacional e lembretes, agora fora do VS Code.</h1>
-        <p class="hero-copy">
-          Esta interface usa o mesmo motor local do Jarvis para registrar fatos,
-          acompanhar pendencias e consultar contexto no desktop ou no celular.
+        <h1>Um prompt. Sem botoes.</h1>
+        <p>
+          Digite sua instrucao e pressione <strong>Enter</strong>. Use
+          <strong>Shift+Enter</strong> para quebrar linha.
         </p>
-        <div class="api-config">
-          <label for="api-base-url">URL da API (vazio = mesmo dominio)</label>
-          <div class="api-config-row">
-            <input
-              id="api-base-url"
-              type="text"
-              placeholder="https://jarvis-api.onrender.com"
-            />
-            <button id="save-api-base" class="ghost-button" type="button">Salvar URL</button>
-            <button id="test-api-base" class="ghost-button" type="button">Testar conexao</button>
-          </div>
-          <p id="api-base-feedback" class="feedback"></p>
-        </div>
-        <div class="hero-actions">
-          <button class="ghost-button" data-scroll-target="capture-panel">
-            Nova anotacao
-          </button>
-          <button class="ghost-button" data-scroll-target="reminders-panel">
-            Lembretes
-          </button>
-        </div>
+        <p class="status-line" id="connection-status">Conectando...</p>
       </header>
 
-      <main class="dashboard">
-        <section class="panel panel-accent" id="capture-panel">
-          <div class="panel-heading">
-            <p class="panel-kicker">Captura rapida</p>
-            <h2>Registrar memoria</h2>
-          </div>
-          <form id="log-form" class="stack">
-            <label class="field">
-              <span>Nova anotacao</span>
-              <textarea
-                name="text"
-                rows="4"
-                placeholder="Ex.: Victor alinhou com Julio a retirada das pecas em Cachoeiro."
-                required
-              ></textarea>
-            </label>
-            <button type="submit" class="primary-button">Salvar nota</button>
-          </form>
-          <p class="feedback" id="log-feedback"></p>
-        </section>
+      <section class="prompt-box">
+        <label for="prompt-input">Prompt unico</label>
+        <textarea
+          id="prompt-input"
+          rows="5"
+          placeholder="Ex.: log: Victor alinhou com Julio a retirada das pecas."
+        ></textarea>
+        <p class="hint-line">
+          Exemplos: <code>today</code>, <code>context</code>,
+          <code>search: victor</code>, <code>remind: Revisar ADs | 2026-04-10 09:00</code>,
+          <code>done: 1</code>.
+        </p>
+      </section>
 
-        <section class="panel" id="reminders-panel">
-          <div class="panel-heading">
-            <p class="panel-kicker">Pendencias</p>
-            <h2>Criar lembrete</h2>
-          </div>
-          <form id="reminder-form" class="grid-form">
-            <label class="field">
-              <span>Titulo</span>
-              <input
-                type="text"
-                name="title"
-                placeholder="Ex.: Confirmar retirada das pecas"
-                required
-              />
-            </label>
-            <label class="field">
-              <span>Data e hora</span>
-              <input type="text" name="datetime" placeholder="2026-03-11 08:30" required />
-            </label>
-            <button type="submit" class="primary-button">Criar lembrete</button>
-          </form>
-          <p class="feedback" id="reminder-feedback"></p>
-          <div class="list-block">
-            <div class="section-title-row">
-              <h3>Lembretes ativos</h3>
-              <button type="button" class="link-button" id="refresh-reminders">
-                Atualizar
-              </button>
-            </div>
-            <div id="reminders-list" class="card-list"></div>
-          </div>
-        </section>
+      <section class="response-box">
+        <h2>Resposta</h2>
+        <div id="response-log"></div>
+      </section>
+    </main>
 
-        <section class="panel">
-          <div class="panel-heading">
-            <p class="panel-kicker">Busca</p>
-            <h2>Consultar historico</h2>
-          </div>
-          <form id="search-form" class="search-row">
-            <input type="text" name="query" placeholder="Buscar por Victor, Cachoeiro, Julio..." required />
-            <button type="submit" class="primary-button">Buscar</button>
-          </form>
-          <div class="split-results">
-            <div>
-              <h3>Entradas no log</h3>
-              <div id="search-logs" class="card-list muted-empty"></div>
-            </div>
-            <div>
-              <h3>Mapa de memoria</h3>
-              <div id="search-map" class="card-list muted-empty"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel panel-wide">
-          <div class="panel-heading">
-            <p class="panel-kicker">Visao de hoje</p>
-            <h2>Contexto operacional</h2>
-          </div>
-          <div class="two-column">
-            <div>
-              <div class="section-title-row">
-                <h3>Registros de hoje</h3>
-                <button type="button" class="link-button" id="refresh-overview">
-                  Atualizar painel
-                </button>
-              </div>
-              <div id="today-list" class="card-list"></div>
-            </div>
-            <div>
-              <h3>Working context</h3>
-              <pre id="working-context" class="context-box"></pre>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <script src="/static/app.js" defer></script>
+    <script src="./app.js" defer></script>
   </body>
 </html>

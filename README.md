@@ -222,5 +222,5 @@ Output layouts must remain aligned with `docs/report_layouts.md`.
 ## Web MVP
 - The repository now includes a first web layer in `app/` and `frontend/`.
 - This first step keeps the existing local files as the source of truth.
-- For the current scope, the browser interface supports log capture, reminder management, search, today's entries, and working context viewing.
+- For the current scope, the browser interface is single-prompt: one input field drives log capture, reminder management, search, today's entries, context, and conversation capture.
 - Deployment direction and online testing flow are documented in `docs/web_mvp.md`.

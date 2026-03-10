@@ -24,6 +24,7 @@ This document records the business and operational rules that AI agents and deve
 - The web API must reuse the existing persistence flow instead of introducing silent parallel storage.
 - The first web interface must remain responsive for mobile browsers while preserving the same behaviors as the CLI flows it exposes.
 - The first web layer may expose permissive CORS for local prototyping, but production restrictions must be reviewed before public deployment.
+- The web interaction model may be simplified to a single prompt input, but must continue supporting logging, reminders, search, context, and today flows.
 
 ## Rules That Must Be Registered Here
 - Calculation rules

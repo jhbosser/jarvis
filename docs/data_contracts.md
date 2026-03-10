@@ -203,6 +203,25 @@ This document describes the expected data structures used by the current project
 - Response shape:
   - `items`: list of reminder objects compatible with `reminders.json`
 
+### `POST /api/prompt`
+- Purpose: execute a single text prompt that maps to log/reminder/search/context/today/talk flows.
+- Request shape:
+  - `text`: string
+- Response shape:
+  - `mode`: string
+  - `summary`: string
+  - `payload`: object
+- Notes:
+  - supported prompt patterns include:
+    - `log: <texto>`
+    - `remind: <titulo> | <YYYY-MM-DD HH:MM>`
+    - `search: <termo>`
+    - `today` / `hoje`
+    - `context` / `contexto`
+    - `reminders` / `lembretes`
+    - `done: <id>`
+  - any non-command text is handled as conversation capture (`talk` equivalent)
+
 ### `POST /api/log`
 - Purpose: create a new log entry through the web interface.
 - Request shape:

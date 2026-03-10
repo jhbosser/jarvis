@@ -141,13 +141,10 @@ Reports and outputs must not change without updating this file.
 - Format: responsive browser page
 - Expected sections:
   - hero header
-  - API connection settings (API base URL + connection test)
-  - quick log capture
-  - reminder creation and reminder list
-  - historical search
-  - today's records
-  - working context view
+  - single prompt input area
+  - response output panel
 - Important notes:
+  - actions are driven by text prompts submitted with keyboard enter
   - layout must remain usable on mobile widths
   - the page reads and writes through the HTTP API, not direct browser file access
 
@@ -167,3 +164,11 @@ Reports and outputs must not change without updating this file.
   - `recent_logs`
   - `pending_reminders`
   - `working_context`
+
+### HTTP API Prompt Output
+- Report name: `api_prompt`
+- Format: JSON object
+- Expected fields:
+  - `mode`
+  - `summary`
+  - `payload`

@@ -1,24 +1,24 @@
 const API_BASE_STORAGE_KEY = "jarvis_api_base_url";
+const DEFAULT_REMOTE_API = "https://jarvis-twwu.onrender.com";
 
 function normalizeApiBase(value) {
   return String(value || "").trim().replace(/\/+$/, "");
 }
 
+function isNetlifyHost() {
+  return window.location.hostname.endsWith("netlify.app");
+}
+
 function getApiBase() {
-  const saved = localStorage.getItem(API_BASE_STORAGE_KEY);
-  return normalizeApiBase(saved);
+  const saved = normalizeApiBase(localStorage.getItem(API_BASE_STORAGE_KEY));
+  if (saved) return saved;
+  if (isNetlifyHost()) return DEFAULT_REMOTE_API;
+  return "";
 }
 
 function buildApiUrl(path) {
   const base = getApiBase();
   return base ? `${base}${path}` : path;
-}
-
-function setApiBaseFeedback(message, isError = false) {
-  const target = document.querySelector("#api-base-feedback");
-  if (!target) return;
-  target.textContent = message;
-  target.style.color = isError ? "#a83122" : "";
 }
 
 const api = {
@@ -50,52 +50,6 @@ function handleResponse(response) {
   return response.json();
 }
 
-function renderCards(container, items, renderItem) {
-  container.innerHTML = "";
-  if (!items.length) {
-    container.innerHTML = '<p class="empty-state">Nenhum item encontrado.</p>';
-    return;
-  }
-  items.forEach((item) => {
-    const element = document.createElement("article");
-    element.className = "card";
-    element.innerHTML = renderItem(item);
-    container.appendChild(element);
-  });
-}
-
-async function loadOverview() {
-  const data = await api.get("/api/overview");
-  renderCards(
-    document.querySelector("#today-list"),
-    data.today_logs,
-    (entry) => `<strong>Registro</strong><span>${escapeHtml(entry)}</span>`,
-  );
-  document.querySelector("#working-context").textContent = data.working_context;
-  renderReminders(data.pending_reminders);
-}
-
-function renderReminders(items) {
-  renderCards(
-    document.querySelector("#reminders-list"),
-    items,
-    (item) => `
-      <strong>${escapeHtml(item.title)}</strong>
-      <div class="reminder-meta">${escapeHtml(item.datetime)} • ${escapeHtml(item.status)}</div>
-      ${
-        item.status === "pending"
-          ? `<button class="link-button" data-complete-id="${escapeHtml(item.id)}">Concluir</button>`
-          : ""
-      }
-    `,
-  );
-}
-
-async function refreshReminders() {
-  const data = await api.get("/api/reminders");
-  renderReminders(data.items);
-}
-
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -105,151 +59,79 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-async function handleLogSubmit(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const text = form.elements.text.value.trim();
-  if (!text) return;
-
-  try {
-    const data = await api.post("/api/log", { text });
-    document.querySelector("#log-feedback").textContent = `Salvo: ${data.entry}`;
-    form.reset();
-    await loadOverview();
-  } catch (error) {
-    document.querySelector("#log-feedback").textContent = error.message;
-  }
+function renderResponse(title, payload) {
+  const container = document.querySelector("#response-log");
+  const card = document.createElement("article");
+  card.className = "response-item";
+  card.innerHTML = `
+    <h3>${escapeHtml(title)}</h3>
+    <pre>${escapeHtml(JSON.stringify(payload, null, 2))}</pre>
+  `;
+  container.prepend(card);
 }
 
-async function handleReminderSubmit(event) {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const title = form.elements.title.value.trim();
-  const datetime = form.elements.datetime.value.trim();
-  if (!title || !datetime) return;
-
-  try {
-    const data = await api.post("/api/reminders", { title, datetime });
-    document.querySelector("#reminder-feedback").textContent =
-      `Lembrete criado: ${data.title} em ${data.datetime}`;
-    form.reset();
-    await loadOverview();
-  } catch (error) {
-    document.querySelector("#reminder-feedback").textContent = error.message;
-  }
+function setStatus(message, isError = false) {
+  const status = document.querySelector("#connection-status");
+  status.textContent = message;
+  status.style.color = isError ? "#9d1e0f" : "";
 }
 
-async function handleSearchSubmit(event) {
-  event.preventDefault();
-  const query = event.currentTarget.elements.query.value.trim();
-  if (!query) return;
-
-  try {
-    const data = await api.get(`/api/search?q=${encodeURIComponent(query)}`);
-    renderCards(
-      document.querySelector("#search-logs"),
-      data.logs,
-      (entry) => `<strong>Log</strong><span>${escapeHtml(entry)}</span>`,
-    );
-    renderCards(
-      document.querySelector("#search-map"),
-      data.memory_map,
-      (entry) => `<strong>Mapa</strong><pre>${escapeHtml(entry)}</pre>`,
-    );
-  } catch (error) {
-    document.querySelector("#search-logs").innerHTML = `<p class="empty-state">${escapeHtml(error.message)}</p>`;
-    document.querySelector("#search-map").innerHTML = "";
-  }
-}
-
-async function handleReminderActions(event) {
-  const button = event.target.closest("[data-complete-id]");
-  if (!button) return;
-
-  try {
-    await api.post(`/api/reminders/${button.dataset.completeId}/complete`, {});
-    await loadOverview();
-  } catch (error) {
-    document.querySelector("#reminder-feedback").textContent = error.message;
-  }
-}
-
-async function testApiConnection() {
+async function probeConnection() {
   try {
     const health = await api.get("/health");
     if (health.status !== "ok") {
-      throw new Error("Health endpoint respondeu sem status ok.");
+      throw new Error("Health endpoint sem status ok.");
     }
     const base = getApiBase();
-    setApiBaseFeedback(
-      base ? `Conectado em ${base}` : "Conectado em API local (mesmo dominio).",
-    );
+    setStatus(base ? `Conectado em ${base}` : "Conectado na API local.");
   } catch (error) {
-    setApiBaseFeedback(error.message, true);
+    setStatus(`Falha de conexao: ${error.message}`, true);
   }
 }
 
-function initializeApiBaseConfig() {
-  const input = document.querySelector("#api-base-url");
-  const saveButton = document.querySelector("#save-api-base");
-  const testButton = document.querySelector("#test-api-base");
-  if (!input || !saveButton || !testButton) return;
+async function submitPrompt(rawText) {
+  const text = rawText.trim();
+  if (!text) return;
 
-  input.value = getApiBase();
-
-  saveButton.addEventListener("click", () => {
-    const normalized = normalizeApiBase(input.value);
-    if (normalized) {
-      localStorage.setItem(API_BASE_STORAGE_KEY, normalized);
-      input.value = normalized;
-      setApiBaseFeedback(`URL salva: ${normalized}`);
-    } else {
-      localStorage.removeItem(API_BASE_STORAGE_KEY);
-      setApiBaseFeedback("URL limpa. Usando API no mesmo dominio.");
+  if (text.toLowerCase().startsWith("/api ")) {
+    const url = normalizeApiBase(text.slice(5));
+    if (!url) {
+      renderResponse("Erro", { detail: "Use: /api https://seu-backend" });
+      return;
     }
-  });
+    localStorage.setItem(API_BASE_STORAGE_KEY, url);
+    await probeConnection();
+    renderResponse("Config API", { api_base_url: url, saved: true });
+    return;
+  }
 
-  testButton.addEventListener("click", () => {
-    testApiConnection();
-  });
+  try {
+    const result = await api.post("/api/prompt", { text });
+    renderResponse(result.summary || result.mode || "Resposta", result.payload || {});
+  } catch (error) {
+    renderResponse("Erro", { detail: error.message });
+  }
 }
 
-function registerScrollButtons() {
-  document.querySelectorAll("[data-scroll-target]").forEach((button) => {
-    button.addEventListener("click", () => {
-      document.getElementById(button.dataset.scrollTarget)?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    });
+function registerPromptInput() {
+  const input = document.querySelector("#prompt-input");
+  input.addEventListener("keydown", async (event) => {
+    if (event.key !== "Enter" || event.shiftKey) return;
+    event.preventDefault();
+    const value = input.value;
+    input.value = "";
+    await submitPrompt(value);
   });
 }
 
 function bootstrap() {
-  initializeApiBaseConfig();
-  document.querySelector("#log-form").addEventListener("submit", handleLogSubmit);
-  document
-    .querySelector("#reminder-form")
-    .addEventListener("submit", handleReminderSubmit);
-  document
-    .querySelector("#search-form")
-    .addEventListener("submit", handleSearchSubmit);
-  document
-    .querySelector("#refresh-overview")
-    .addEventListener("click", () => loadOverview());
-  document
-    .querySelector("#refresh-reminders")
-    .addEventListener("click", () => refreshReminders());
-  document
-    .querySelector("#reminders-list")
-    .addEventListener("click", handleReminderActions);
-  registerScrollButtons();
-  loadOverview().catch((error) => {
-    document.querySelector("#working-context").textContent = error.message;
-    setApiBaseFeedback(
-      "Nao foi possivel carregar o painel. Verifique a URL da API e teste a conexao.",
-      true,
-    );
+  registerPromptInput();
+  probeConnection();
+  renderResponse("Dica", {
+    envio: "Digite no prompt e pressione Enter.",
+    quebra_linha: "Use Shift+Enter.",
+    api_override: "Opcional: /api https://seu-backend",
+    ajuda: "Digite help para ver comandos.",
   });
 }
 
