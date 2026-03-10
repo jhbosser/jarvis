@@ -3,38 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jarvis Web</title>
+    <title>Jarvis Prompt</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <main class="single-prompt-page">
-      <header class="single-prompt-hero">
-        <p class="eyebrow">Jarvis Web</p>
-        <h1>Um prompt. Sem botoes.</h1>
-        <p>
-          Digite sua instrucao e pressione <strong>Enter</strong>. Use
-          <strong>Shift+Enter</strong> para quebrar linha.
-        </p>
-        <p class="status-line" id="connection-status">Conectando...</p>
+    <main class="chat-shell">
+      <header class="chat-header">
+        <div>
+          <p class="eyebrow">Jarvis Prompt</p>
+          <h1>Converse com um prompt so.</h1>
+        </div>
+        <p class="status-pill" id="connection-status">Conectando...</p>
       </header>
 
-      <section class="prompt-box">
-        <label for="prompt-input">Prompt unico</label>
+      <section class="chat-history" id="chat-history" aria-live="polite"></section>
+
+      <section class="composer-shell">
+        <label for="prompt-input">Prompt</label>
         <textarea
           id="prompt-input"
-          rows="5"
-          placeholder="Ex.: log: Victor alinhou com Julio a retirada das pecas."
+          rows="3"
+          placeholder="Digite e aperte Enter. Ex.: search: victor"
         ></textarea>
         <p class="hint-line">
-          Exemplos: <code>today</code>, <code>context</code>,
-          <code>search: victor</code>, <code>remind: Revisar ADs | 2026-04-10 09:00</code>,
-          <code>done: 1</code>.
+          Enter envia. Shift+Enter quebra linha. Comandos: <code>help</code>,
+          <code>today</code>, <code>context</code>,
+          <code>search: termo</code>, <code>remind: titulo | data</code>,
+          <code>done: id</code>, <code>/api https://seu-backend</code>.
         </p>
-      </section>
-
-      <section class="response-box">
-        <h2>Resposta</h2>
-        <div id="response-log"></div>
       </section>
     </main>
 

@@ -33,6 +33,7 @@ Use this checklist when validating changes in this repository.
 - `talk` creates both the conversation file and the summary file with the documented layout.
 - The web dashboard remains usable on mobile-width screens.
 - The web dashboard remains usable with a single-prompt interaction model (no action buttons required).
+- Prompt submissions should appear in history with corresponding assistant responses.
 - Read-only flows (`search`, `today`, `context`, `GET /api/context`, `GET /api/overview`) should not trigger unintended rewrites in persisted files.
 
 ## Documentation Consistency
